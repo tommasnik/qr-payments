@@ -1,18 +1,19 @@
 import { useState } from 'react'
-import { useLocalStorage } from './hooks/useLocalStorage'
+import { useAppConfig } from './hooks/useAppConfig'
 import { ChildrenSettings } from './components/ChildrenSettings'
 import { PaymentForm } from './components/PaymentForm'
 import { QRCodeCard } from './components/QRCodeCard'
 import { createPaymentDetails } from './utils/spdGenerator'
+import { isValidAccountNumber } from './utils/accountParser'
 
 export default function App() {
-  const [children, setChildren] = useLocalStorage('slunovrat-children', [])
+  const { children, setChildren, accountNumber, setAccountNumber } = useAppConfig()
   const [payments, setPayments] = useState([])
   const [showSettings, setShowSettings] = useState(false)
 
   const handleGenerate = ({ amount, note }) => {
     const newPayments = children.map((child) => 
-      createPaymentDetails({ child, amount, note })
+      createPaymentDetails({ child, amount, note, accountNumber })
     )
     setPayments(newPayments)
   }
@@ -23,6 +24,8 @@ export default function App() {
 
   const hasChildren = children.length > 0
   const hasPayments = payments.length > 0
+  const hasValidAccount = isValidAccountNumber(accountNumber)
+  const canGenerate = hasChildren && hasValidAccount
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -45,14 +48,14 @@ export default function App() {
             </div>
             <h2 className="text-xl font-semibold mb-2">Začněte přidáním dětí</h2>
             <p className="text-slate-400 mb-6">
-              Pro generování QR kódů nejprve nastavte děti a jejich variabilní symboly
+              Pro generování QR kódů nejprve nastavte číslo účtu a děti s jejich variabilními symboly
             </p>
             <button
               onClick={() => setShowSettings(true)}
               className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-xl 
                          font-medium transition-colors"
             >
-              Nastavit děti
+              Nastavit
             </button>
           </div>
         )}
@@ -68,21 +71,23 @@ export default function App() {
                     : 'bg-slate-800/50 text-slate-400 hover:text-slate-200'
                 }`}
               >
-                {showSettings ? 'Skrýt nastavení' : 'Nastavení dětí'}
+                {showSettings ? 'Skrýt nastavení' : 'Nastavení'}
               </button>
             </div>
 
             {showSettings && (
               <ChildrenSettings 
                 children={children} 
-                onChildrenChange={setChildren} 
+                onChildrenChange={setChildren}
+                accountNumber={accountNumber}
+                onAccountNumberChange={setAccountNumber}
               />
             )}
 
             {hasChildren && !hasPayments && (
               <PaymentForm 
                 onGenerate={handleGenerate} 
-                disabled={!hasChildren} 
+                disabled={!canGenerate} 
               />
             )}
 
@@ -110,7 +115,7 @@ export default function App() {
         )}
 
         <footer className="mt-12 text-center text-slate-600 text-sm">
-          <p>Číslo účtu školy je uloženo v konfiguraci aplikace</p>
+          <p>Číslo účtu: {accountNumber || 'nenastaveno'}</p>
         </footer>
       </div>
     </div>

@@ -1,8 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { isValidAccountNumber } from '../utils/accountParser'
 
-export function ChildrenSettings({ children, onChildrenChange }) {
+export function ChildrenSettings({ 
+  children, 
+  onChildrenChange,
+  accountNumber,
+  onAccountNumberChange 
+}) {
   const [name, setName] = useState('')
   const [variableSymbol, setVariableSymbol] = useState('')
+  const [editedAccountNumber, setEditedAccountNumber] = useState(accountNumber)
+
+  useEffect(() => {
+    setEditedAccountNumber(accountNumber)
+  }, [accountNumber])
 
   const handleAdd = (e) => {
     e.preventDefault()
@@ -23,9 +34,57 @@ export function ChildrenSettings({ children, onChildrenChange }) {
     onChildrenChange(children.filter(child => child.id !== id))
   }
 
+  const isAccountValid = isValidAccountNumber(editedAccountNumber)
+  const hasAccountChanged = editedAccountNumber !== accountNumber
+  const canSaveAccount = hasAccountChanged && isAccountValid
+
+  const handleSaveAccount = () => {
+    if (canSaveAccount) {
+      onAccountNumberChange(editedAccountNumber)
+    }
+  }
+
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-      <h2 className="text-xl font-semibold mb-4 text-cyan-400">Nastavení dětí</h2>
+      <h2 className="text-xl font-semibold mb-4 text-cyan-400">Nastavení</h2>
+      
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-slate-300 mb-2">
+          Číslo účtu školy
+        </label>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            placeholder="např. 2717100083/0800 nebo 86-7058470277/0100"
+            value={editedAccountNumber}
+            onChange={(e) => setEditedAccountNumber(e.target.value)}
+            className={`flex-1 px-4 py-3 bg-slate-900/50 border rounded-xl 
+                       focus:outline-none focus:ring-2 focus:border-transparent
+                       placeholder-slate-500 transition-all ${
+                         editedAccountNumber && !isAccountValid
+                           ? 'border-red-500 focus:ring-red-500'
+                           : 'border-slate-600 focus:ring-cyan-500'
+                       }`}
+          />
+          <button
+            type="button"
+            onClick={handleSaveAccount}
+            disabled={!canSaveAccount}
+            className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-700 
+                       disabled:cursor-not-allowed rounded-xl font-medium transition-colors
+                       whitespace-nowrap"
+          >
+            Uložit
+          </button>
+        </div>
+        {editedAccountNumber && !isAccountValid && (
+          <p className="mt-2 text-sm text-red-400">
+            Neplatný formát. Použijte formát: číslo/kód nebo prefix-číslo/kód
+          </p>
+        )}
+      </div>
+
+      <h3 className="text-lg font-medium mb-3 text-slate-300">Děti</h3>
       
       <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-3 mb-6">
         <input

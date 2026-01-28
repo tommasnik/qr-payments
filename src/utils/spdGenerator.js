@@ -1,8 +1,9 @@
-import { SCHOOL_ACCOUNT } from '../config'
+import { parseAccountNumber, formatAccountNumber } from './accountParser'
 
-function calculateCzechIBAN(accountNumber, bankCode) {
-  const paddedAccount = accountNumber.padStart(16, '0')
-  const bban = bankCode + paddedAccount
+export function calculateCzechIBAN(prefix, accountNumber, bankCode) {
+  const paddedPrefix = prefix.padStart(6, '0')
+  const paddedAccount = accountNumber.padStart(10, '0')
+  const bban = bankCode + paddedPrefix + paddedAccount
   
   const numericIBAN = bban + '123500'
   
@@ -15,8 +16,12 @@ function calculateCzechIBAN(accountNumber, bankCode) {
   return `CZ${checkDigits}${bban}`
 }
 
-export function generateSPD({ amount, variableSymbol, message }) {
-  const iban = calculateCzechIBAN(SCHOOL_ACCOUNT.number, SCHOOL_ACCOUNT.bankCode)
+export function generateSPD({ account, amount, variableSymbol, message }) {
+  const iban = calculateCzechIBAN(
+    account.prefix || '',
+    account.number,
+    account.bankCode
+  )
   
   const parts = [
     'SPD*1.0',
@@ -34,16 +39,22 @@ export function generateSPD({ amount, variableSymbol, message }) {
   return parts.join('*')
 }
 
-export function createPaymentDetails({ child, amount, note }) {
+export function createPaymentDetails({ child, amount, note, accountNumber }) {
   const message = note ? `${note} - ${child.name}` : child.name
+  const account = parseAccountNumber(accountNumber)
+  
+  if (!account) {
+    throw new Error('Invalid account number')
+  }
   
   return {
     child,
     amount,
     variableSymbol: child.variableSymbol,
     message,
-    account: SCHOOL_ACCOUNT.full,
+    account: formatAccountNumber(account),
     spdString: generateSPD({
+      account,
       amount,
       variableSymbol: child.variableSymbol,
       message
