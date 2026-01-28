@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAppConfig } from './hooks/useAppConfig'
+import { useUrlPayment } from './hooks/useUrlPayment'
 import { ChildrenSettings } from './components/ChildrenSettings'
 import { PaymentForm } from './components/PaymentForm'
 import { QRCodeCard } from './components/QRCodeCard'
@@ -10,17 +11,33 @@ export default function App() {
   const { children, setChildren, accountNumber, setAccountNumber } = useAppConfig()
   const [payments, setPayments] = useState([])
   const [showSettings, setShowSettings] = useState(false)
+  const { getUrlPayment, setUrlPayment, clearUrlPayment } = useUrlPayment()
 
-  const handleGenerate = ({ amount, note }) => {
+  const generatePayments = (amount, note) => {
     const newPayments = children.map((child) => 
       createPaymentDetails({ child, amount, note, accountNumber })
     )
     setPayments(newPayments)
   }
 
+  const handleGenerate = ({ amount, note }) => {
+    generatePayments(amount, note)
+    setUrlPayment(amount, note)
+  }
+
   const handleClear = () => {
     setPayments([])
+    clearUrlPayment()
   }
+
+  useEffect(() => {
+    if (children.length === 0) return
+    
+    const urlPayment = getUrlPayment()
+    if (urlPayment) {
+      generatePayments(urlPayment.amount, urlPayment.note)
+    }
+  }, [children.length, accountNumber])
 
   const hasChildren = children.length > 0
   const hasPayments = payments.length > 0
