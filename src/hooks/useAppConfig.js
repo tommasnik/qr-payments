@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { SCHOOL_ACCOUNT } from '../config'
 import { formatAccountNumber } from '../utils/accountParser'
 
-const STORAGE_KEY = 'slunovrat-config'
+const STORAGE_KEY = 'config'
 const CURRENT_VERSION = 1
 
 const DEFAULT_CONFIG = {
@@ -40,6 +40,15 @@ export function useAppConfig() {
 
   useEffect(() => {
     try {
+      const oldSlunovratConfig = window.localStorage.getItem('slunovrat-config')
+      if (oldSlunovratConfig && !window.localStorage.getItem(STORAGE_KEY)) {
+        const parsed = JSON.parse(oldSlunovratConfig)
+        const migratedConfig = migrateConfig(parsed)
+        setConfig(migratedConfig)
+        window.localStorage.removeItem('slunovrat-config')
+        return
+      }
+      
       const oldChildrenData = window.localStorage.getItem('slunovrat-children')
       if (oldChildrenData && !window.localStorage.getItem(STORAGE_KEY)) {
         const children = JSON.parse(oldChildrenData)

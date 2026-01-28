@@ -32,9 +32,9 @@ export default function App() {
       <div className="max-w-4xl mx-auto">
         <header className="text-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-            Platby do školy
+            Platby
           </h1>
-          <p className="text-slate-400">Generátor QR kódů pro školní platby</p>
+          <p className="text-slate-400">Generátor QR kódů pro platby</p>
         </header>
 
         {!hasChildren && !showSettings && (
@@ -75,19 +75,32 @@ export default function App() {
               </button>
             </div>
 
-            {showSettings && (
+            {showSettings ? (
               <ChildrenSettings 
                 children={children} 
                 onChildrenChange={setChildren}
                 accountNumber={accountNumber}
                 onAccountNumberChange={setAccountNumber}
               />
+            ) : hasChildren && (
+              <div className="flex flex-wrap gap-2">
+                {children.map((child) => (
+                  <span 
+                    key={child.id}
+                    className="px-3 py-1.5 bg-slate-800/50 border border-slate-700/50 
+                               rounded-lg text-slate-300 text-sm"
+                  >
+                    {child.name}
+                  </span>
+                ))}
+              </div>
             )}
 
             {hasChildren && !hasPayments && (
               <PaymentForm 
                 onGenerate={handleGenerate} 
-                disabled={!canGenerate} 
+                disabled={!canGenerate}
+                accountNumber={accountNumber}
               />
             )}
 
@@ -115,7 +128,7 @@ export default function App() {
         )}
 
         <footer className="mt-12 text-center text-slate-600 text-sm">
-          <p>Číslo účtu: {accountNumber || 'nenastaveno'}</p>
+          <p>Data uložena pouze lokálně v prohlížeči</p>
         </footer>
       </div>
     </div>

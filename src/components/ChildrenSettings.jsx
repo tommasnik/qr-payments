@@ -46,7 +46,10 @@ export function ChildrenSettings({
 
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-      <h2 className="text-xl font-semibold mb-4 text-cyan-400">Nastavení</h2>
+      <h2 className="text-xl font-semibold mb-2 text-cyan-400">Nastavení</h2>
+      <p className="text-sm text-slate-500 mb-4">
+        Všechna data jsou uložena pouze lokálně ve vašem prohlížeči a nikam se neodesílají.
+      </p>
       
       <div className="mb-6">
         <label className="block text-sm font-medium text-slate-300 mb-2">

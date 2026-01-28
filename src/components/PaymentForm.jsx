@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export function PaymentForm({ onGenerate, disabled }) {
+export function PaymentForm({ onGenerate, disabled, accountNumber }) {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
 
@@ -15,7 +15,9 @@ export function PaymentForm({ onGenerate, disabled }) {
 
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-      <h2 className="text-xl font-semibold mb-4 text-emerald-400">Nová platba</h2>
+      <h2 className="text-xl font-semibold mb-4 text-emerald-400">
+        Nová platba {accountNumber && <span className="text-slate-400 font-normal">– {accountNumber}</span>}
+      </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
