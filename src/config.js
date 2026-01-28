@@ -1,7 +1,7 @@
 export const SCHOOL_ACCOUNT = {
   prefix: '',
-  number: '123456789',
-  bankCode: '0800',
+  number: '2401685636',
+  bankCode: '2010',
   
   get full() {
     const prefixPart = this.prefix ? `${this.prefix}-` : ''
