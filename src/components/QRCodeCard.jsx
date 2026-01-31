@@ -26,7 +26,7 @@ export function QRCodeCard({ payment }) {
         await navigator.share({
           files: [file],
           title: `Platba - ${payment.child.name}`,
-          text: `${payment.amount} Kč - ${payment.message}`
+          text: `${payment.amount} Kč${payment.message ? ` - ${payment.message}` : ''}`
         })
       } else {
         handleDownload()
@@ -64,8 +64,8 @@ export function QRCodeCard({ payment }) {
           <span className="font-mono">{payment.variableSymbol}</span>
         </div>
         <div className="flex justify-between py-2">
-          <span className="text-slate-400">Zpráva:</span>
-          <span className="text-right max-w-[60%]">{payment.message}</span>
+          <span className="text-slate-400">Zpráva pro příjemce:</span>
+          <span className="text-right max-w-[60%]">{payment.message || '-'}</span>
         </div>
       </div>
 

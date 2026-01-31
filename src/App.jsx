@@ -13,15 +13,15 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false)
   const { getUrlPayment, setUrlPayment, clearUrlPayment } = useUrlPayment()
 
-  const generatePayments = (amount, note) => {
+  const generatePayments = (amount, note, addChildName) => {
     const newPayments = children.map((child) => 
-      createPaymentDetails({ child, amount, note, accountNumber })
+      createPaymentDetails({ child, amount, note, accountNumber, addChildName })
     )
     setPayments(newPayments)
   }
 
-  const handleGenerate = ({ amount, note }) => {
-    generatePayments(amount, note)
+  const handleGenerate = ({ amount, note, addChildName }) => {
+    generatePayments(amount, note, addChildName)
     setUrlPayment(amount, note)
   }
 
@@ -35,7 +35,7 @@ export default function App() {
     
     const urlPayment = getUrlPayment()
     if (urlPayment) {
-      generatePayments(urlPayment.amount, urlPayment.note)
+      generatePayments(urlPayment.amount, urlPayment.note, false)
     }
   }, [children.length, accountNumber])
 

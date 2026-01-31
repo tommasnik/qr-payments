@@ -39,8 +39,10 @@ export function generateSPD({ account, amount, variableSymbol, message }) {
   return parts.join('*')
 }
 
-export function createPaymentDetails({ child, amount, note, accountNumber }) {
-  const message = note ? `${note} - ${child.name}` : child.name
+export function createPaymentDetails({ child, amount, note, accountNumber, addChildName = false }) {
+  const message = note 
+    ? (addChildName ? `${note} - ${child.name}` : note)
+    : ''
   const account = parseAccountNumber(accountNumber)
   
   if (!account) {

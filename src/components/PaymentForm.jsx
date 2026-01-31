@@ -3,12 +3,13 @@ import { useState } from 'react'
 export function PaymentForm({ onGenerate, disabled, accountNumber }) {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
+  const [addChildName, setAddChildName] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
     const parsedAmount = parseFloat(amount)
     if (isNaN(parsedAmount) || parsedAmount <= 0) return
-    onGenerate({ amount: parsedAmount, note: note.trim() })
+    onGenerate({ amount: parsedAmount, note: note.trim(), addChildName })
   }
 
   const isValid = amount && parseFloat(amount) > 0
@@ -18,7 +19,7 @@ export function PaymentForm({ onGenerate, disabled, accountNumber }) {
       <h2 className="text-xl font-semibold mb-4 text-emerald-400">
         Nová platba {accountNumber && <span className="text-slate-400 font-normal">– {accountNumber}</span>}
       </h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm text-slate-400 mb-2">Částka (Kč)</label>
@@ -29,12 +30,12 @@ export function PaymentForm({ onGenerate, disabled, accountNumber }) {
             onChange={(e) => setAmount(e.target.value)}
             min="1"
             step="1"
-            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl 
+            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl
                        focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
                        placeholder-slate-500 transition-all text-2xl font-semibold"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm text-slate-400 mb-2">Poznámka k platbě</label>
           <input
@@ -42,18 +43,33 @@ export function PaymentForm({ onGenerate, disabled, accountNumber }) {
             placeholder="např. Výjezd leden"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl 
+            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl
                        focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
                        placeholder-slate-500 transition-all"
           />
         </div>
 
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            id="addChildName"
+            checked={addChildName}
+            onChange={(e) => setAddChildName(e.target.checked)}
+            className="w-5 h-5 rounded border-slate-600 bg-slate-900/50
+                       text-emerald-600 focus:ring-2 focus:ring-emerald-500
+                       focus:ring-offset-0 focus:ring-offset-slate-800 cursor-pointer"
+          />
+          <label htmlFor="addChildName" className="text-sm text-slate-300 cursor-pointer">
+            Přidat jméno dítěte k zprávě pro příjemce
+          </label>
+        </div>
+
         <button
           type="submit"
           disabled={!isValid || disabled}
-          className="w-full py-4 bg-gradient-to-r from-emerald-600 to-cyan-600 
-                     hover:from-emerald-500 hover:to-cyan-500 
-                     disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed 
+          className="w-full py-4 bg-gradient-to-r from-emerald-600 to-cyan-600
+                     hover:from-emerald-500 hover:to-cyan-500
+                     disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed
                      rounded-xl font-semibold text-lg transition-all transform hover:scale-[1.02]
                      active:scale-[0.98] shadow-lg shadow-emerald-500/20"
         >
