@@ -1,8 +1,9 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 
 export function QRCodeCard({ payment }) {
   const containerRef = useRef(null)
+  const [isPaid, setIsPaid] = useState(false)
 
   const handleDownload = useCallback(() => {
     const canvas = containerRef.current?.querySelector('canvas')
@@ -41,13 +42,49 @@ export function QRCodeCard({ payment }) {
                     flex flex-col items-center">
       <h3 className="text-xl font-semibold mb-4 text-amber-400">{payment.child.name}</h3>
       
-      <div ref={containerRef} className="bg-white p-4 rounded-xl mb-4">
-        <QRCodeCanvas
-          value={payment.spdString}
-          size={200}
-          level="M"
-          marginSize={1}
-        />
+      <div
+        ref={containerRef}
+        className="bg-white p-4 rounded-xl mb-4 relative group"
+      >
+        {isPaid ? (
+          <button
+            type="button"
+            onClick={() => setIsPaid(false)}
+            className="w-[200px] h-[200px] flex items-center justify-center rounded-lg border-2 border-emerald-500 text-emerald-600 font-semibold bg-white/90"
+          >
+            <span className="flex items-center gap-2">
+              <span className="w-6 h-6 border-2 border-emerald-500 rounded flex items-center justify-center">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </span>
+              Zaplaceno
+            </span>
+          </button>
+        ) : (
+          <>
+            <QRCodeCanvas
+              value={payment.spdString}
+              size={200}
+              level="M"
+              marginSize={1}
+            />
+            <button
+              type="button"
+              onClick={() => setIsPaid(true)}
+              className="absolute inset-0 flex items-center justify-center rounded-xl bg-white/75 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <span className="flex items-center gap-2 text-emerald-700 font-semibold">
+                <span className="w-6 h-6 border-2 border-emerald-600 rounded flex items-center justify-center">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                Zaplaceno
+              </span>
+            </button>
+          </>
+        )}
       </div>
 
       <div className="w-full space-y-2 text-sm mb-4">
