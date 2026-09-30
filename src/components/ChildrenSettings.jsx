@@ -55,7 +55,7 @@ export function ChildrenSettings({
         <label className="block text-sm font-medium text-slate-300 mb-2">
           Číslo účtu školy
         </label>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             placeholder="např. 2717100083/0800 nebo 86-7058470277/0100"
