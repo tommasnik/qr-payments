@@ -6,27 +6,31 @@ import { PaymentForm } from './components/PaymentForm'
 import { QRCodeCard } from './components/QRCodeCard'
 import { createPaymentDetails } from './utils/spdGenerator'
 import { isValidAccountNumber } from './utils/accountParser'
+import { filterChildrenByNames } from './utils/childrenFilter'
 
 export default function App() {
   const { children, setChildren, accountNumber, setAccountNumber } = useAppConfig()
   const [payments, setPayments] = useState([])
   const [showSettings, setShowSettings] = useState(false)
+  const [unmatchedNames, setUnmatchedNames] = useState([])
   const { getUrlPayment, setUrlPayment, clearUrlPayment } = useUrlPayment()
 
-  const generatePayments = (amount, note, addChildName) => {
-    const newPayments = children.map((child) => 
+  const generatePayments = (amount, note, addChildName, payingChildren = children) => {
+    const newPayments = payingChildren.map((child) => 
       createPaymentDetails({ child, amount, note, accountNumber, addChildName })
     )
     setPayments(newPayments)
   }
 
   const handleGenerate = ({ amount, note, addChildName }) => {
+    setUnmatchedNames([])
     generatePayments(amount, note, addChildName)
     setUrlPayment(amount, note)
   }
 
   const handleClear = () => {
     setPayments([])
+    setUnmatchedNames([])
     clearUrlPayment()
   }
 
@@ -35,7 +39,9 @@ export default function App() {
     
     const urlPayment = getUrlPayment()
     if (urlPayment) {
-      generatePayments(urlPayment.amount, urlPayment.note, false)
+      const filtered = filterChildrenByNames(children, urlPayment.childNames)
+      setUnmatchedNames(filtered.unmatchedNames)
+      generatePayments(urlPayment.amount, urlPayment.note, false, filtered.children)
     }
   }, [children.length, accountNumber])
 
@@ -133,7 +139,13 @@ export default function App() {
                     Nová platba
                   </button>
                 </div>
-                
+
+                {unmatchedNames.length > 0 && (
+                  <p className="px-4 py-3 rounded-xl border border-amber-500/50 bg-amber-500/10 text-amber-300 text-sm">
+                    Nenalezené děti: {unmatchedNames.join(', ')}. Zobrazuji QR kódy pro všechny děti.
+                  </p>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {payments.map((payment) => (
                     <QRCodeCard key={payment.child.id} payment={payment} />

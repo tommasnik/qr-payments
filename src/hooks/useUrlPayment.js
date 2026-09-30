@@ -3,6 +3,7 @@ export function useUrlPayment() {
     const params = new URLSearchParams(window.location.search)
     const amountStr = params.get('amount')
     const note = params.get('note')
+    const childNames = params.get('children')
 
     if (!amountStr) {
       return null
@@ -13,7 +14,7 @@ export function useUrlPayment() {
       return null
     }
 
-    return { amount, note: note || '' }
+    return { amount, note: note || '', childNames }
   }
 
   const setUrlPayment = (amount, note) => {
@@ -24,6 +25,7 @@ export function useUrlPayment() {
     } else {
       url.searchParams.delete('note')
     }
+    url.searchParams.delete('children')
     window.history.replaceState({}, '', url.toString())
   }
 
@@ -31,6 +33,7 @@ export function useUrlPayment() {
     const url = new URL(window.location.href)
     url.searchParams.delete('amount')
     url.searchParams.delete('note')
+    url.searchParams.delete('children')
     window.history.replaceState({}, '', url.toString())
   }
 
