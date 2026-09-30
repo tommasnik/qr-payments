@@ -20,7 +20,8 @@ export function ChildrenSettings({
     if (!name.trim() || !variableSymbol.trim()) return
     
     const newChild = {
-      id: crypto.randomUUID(),
+      // randomUUID exists only in a secure context (HTTPS or localhost).
+      id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       name: name.trim(),
       variableSymbol: variableSymbol.trim()
     }
